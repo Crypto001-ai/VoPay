@@ -1,0 +1,6 @@
+{
+  "name": "VoPay",
+  "description": "AI-powered voice-first transaction safety assistant on Solana. Understand before you sign.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": []
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoPay | Secure Solana Transactions</title>
+    <script>
+      (function() {
+        // Solana/Web3 polyfill fixes
+        if (typeof global === 'undefined') {
+          window.global = window;
+        }
+
+        // Prevent "Cannot set property fetch of #<Window> which has only a getter"
+        // This happens when polyfills like isomorphic-fetch try to overwrite a read-only fetch
+        const originalFetch = window.fetch;
+        if (originalFetch) {
+          try {
+            Object.defineProperty(window, 'fetch', {
+              get: function() { return originalFetch; },
+              set: function() { 
+                console.warn('VoPay: Blocked attempt to overwrite window.fetch'); 
+              },
+              configurable: true
+            });
+          } catch (e) {
+            console.error('VoPay: Failed to set fetch safeguard', e);
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

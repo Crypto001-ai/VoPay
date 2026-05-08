@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #09090B;
+  --bg-secondary: #111827;
+  --card-bg: rgba(17, 24, 39, 0.7);
+  --text-primary: #FFFFFF;
+  --text-secondary: #CBD5E1;
+  --border-primary: rgba(255, 255, 255, 0.08);
+  
+  --solana-purple: #9945FF;
+  --solana-green: #14F195;
+  --accent-blue: #3B82F6;
+
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+:root.light {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border-primary: rgba(15, 23, 42, 0.08);
+
+  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+@theme {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-secondary: var(--bg-secondary);
+  --color-muted: var(--text-secondary);
+  --color-border: var(--border-primary);
+  
+  --color-solana-purple: var(--solana-purple);
+  --color-solana-green: var(--solana-green);
+  --color-accent-blue: var(--accent-blue);
+  
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+  
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-solana-purple/30;
+    font-feature-settings: "cv02", "cv05", "cv11";
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-xl border border-border;
+    background-color: var(--glass-bg);
+  }
+  
+  .glass-card {
+    @apply backdrop-blur-2xl border border-border shadow-2xl transition-all duration-300;
+    background-color: var(--card-bg);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-tr from-solana-purple to-solana-green;
+  }
+
+  .bg-solana-gradient {
+    @apply bg-gradient-to-tr from-solana-purple to-solana-green;
+  }
+  
+  .glow-purple {
+    box-shadow: 0 0 50px -10px rgba(153, 69, 255, 0.15);
+  }
+  
+  .glow-green {
+    box-shadow: 0 0 50px -10px rgba(20, 241, 149, 0.15);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
