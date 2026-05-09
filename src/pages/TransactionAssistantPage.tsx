@@ -31,6 +31,18 @@ const SAVED_CONTACTS: Contact[] = [
   { id: '3', name: 'Clinton', address: 'Hng37kXuNDJkG44Wpdg6xLmicWk9NuisjGkwzhayKM5n' },
 ];
 
+function cleanTranscript(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\bsoul\b/gi, 'SOL')
+    .replace(/\bsong\b/gi, 'SOL')
+    .replace(/\bso\b/gi, 'SOL')
+    .replace(/\bsole\b/gi, 'SOL')
+    .replace(/\bsoal\b/gi, 'SOL')
+    .replace(/\bdollars\b/gi, 'SOL')
+    .replace(/\busd\b/gi, 'SOL');
+}
+
 export default function TransactionAssistantPage() {
   const { isConnected } = useUserStore();
   const { setAnalysis, setAnalyzing, isAnalyzing } = useTransactionStore();
@@ -41,6 +53,7 @@ export default function TransactionAssistantPage() {
   const [showOptions, setShowOptions] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [manualAddress, setManualAddress] = useState('');
+  const [manualCommand, setManualCommand] = useState('');
   const [isPasting, setIsPasting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,9 +62,10 @@ export default function TransactionAssistantPage() {
     setError(null);
     
     try {
+      const cleanedTranscript = transcript ? cleanTranscript(transcript) : '';
       const contactToUse = overrideContact || selectedContact;
-      // Use API if there's a transcript, otherwise fallback to UI selection
-      const activeText = transcript || (contactToUse ? `Send money to ${contactToUse.name}` : manualAddress ? `Send to ${manualAddress}` : '');
+      // Use API if there's a transcript/manual command, otherwise fallback to UI selection
+      const activeText = manualCommand || cleanedTranscript || (contactToUse ? `Send money to ${contactToUse.name}` : manualAddress ? `Send to ${manualAddress}` : '');
       
       if (activeText) {
         const response = await fetch('/api/parse', {
@@ -138,7 +152,8 @@ export default function TransactionAssistantPage() {
             interimTranscript += event.results[i][0].transcript;
           }
         }
-        setTranscript(finalTranscript || interimTranscript);
+        const combined = finalTranscript || interimTranscript;
+        setTranscript(cleanTranscript(combined));
       };
 
       recognitionRef.current.onerror = (event: any) => {
@@ -287,7 +302,7 @@ export default function TransactionAssistantPage() {
 
            <div className="min-h-[60px] text-center px-6">
              <AnimatePresence mode="wait">
-               {isListening || transcript ? (
+               {isListening || transcript || manualCommand ? (
                  <motion.div
                    key="transcript"
                    initial={{ opacity: 0, y: 10 }}
@@ -298,16 +313,16 @@ export default function TransactionAssistantPage() {
                      "text-xl md:text-2xl font-black tracking-tight italic transition-colors leading-tight",
                      isListening ? "text-foreground opacity-90" : "text-solana-green"
                    )}>
-                     {transcript || (isListening ? 'VoPay is listening...' : '')}
+                     {manualCommand || transcript || (isListening ? 'VoPay is listening...' : '')}
                    </p>
                    {isListening && (
                      <p className="text-[10px] font-mono text-solana-purple uppercase tracking-[.3em] font-black animate-pulse">Processing Stream</p>
                    )}
-                   {!isListening && transcript && (
+                   {!isListening && (transcript || manualCommand) && (
                      <motion.button
                        initial={{ opacity: 0, scale: 0.9 }}
                        animate={{ opacity: 1, scale: 1 }}
-                       onClick={handlePrepareTransaction}
+                       onClick={() => handlePrepareTransaction()}
                        className="px-8 py-3 rounded-2xl bg-solana-green text-black text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-solana-green/20 hover:scale-105 active:scale-95 transition-all"
                      >
                        Analyze Intent
@@ -326,6 +341,41 @@ export default function TransactionAssistantPage() {
                )}
              </AnimatePresence>
            </div>
+
+           {!isListening && (
+             <motion.div 
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="w-full max-w-md mt-4"
+             >
+               <div className="relative group">
+                 <input 
+                   type="text"
+                   value={manualCommand}
+                   onChange={(e) => {
+                     setManualCommand(e.target.value);
+                     if (e.target.value) setTranscript('');
+                   }}
+                   onKeyDown={(e) => {
+                     if (e.key === 'Enter' && manualCommand) {
+                       handlePrepareTransaction();
+                     }
+                   }}
+                   placeholder="Or type your command here..."
+                   className="w-full bg-foreground/5 border border-border rounded-xl px-12 py-4 text-sm focus:outline-none focus:border-solana-purple/40 transition-all placeholder:text-muted/30 text-foreground"
+                 />
+                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted/30" />
+                 {manualCommand && (
+                   <button 
+                     onClick={() => setManualCommand('')}
+                     className="absolute right-4 top-1/2 -translate-y-1/2 text-muted/30 hover:text-foreground transition-colors"
+                   >
+                     <Trash2 size={16} />
+                   </button>
+                 )}
+               </div>
+             </motion.div>
+           )}
         </div>
 
         {/* State 2: Options Cards */}
