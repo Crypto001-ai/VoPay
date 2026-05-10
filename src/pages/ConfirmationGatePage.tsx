@@ -68,6 +68,13 @@ export default function ConfirmationGatePage() {
         1
       );
 
+      // Wait for confirmation
+      const latestBlockhash = await connection.getLatestBlockhash();
+      await connection.confirmTransaction({
+        signature: txResult.signature,
+        ...latestBlockhash
+      }, 'confirmed');
+
       navigate('/success', {
         state: {
           signature: txResult.signature,

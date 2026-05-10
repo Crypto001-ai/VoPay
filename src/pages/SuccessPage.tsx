@@ -74,8 +74,8 @@ export default function SuccessPage() {
             transition={{ delay: 0.3 }}
             className="space-y-2"
           >
-            <h2 className="text-5xl font-black italic tracking-tighter text-foreground leading-[0.9]">
-               {displayName ? `Great success, ${displayName}` : 'Transaction Sent'}
+            <h2 className="text-5xl font-black italic tracking-tighter text-foreground leading-[0.9] uppercase">
+               Transaction Successful!
             </h2>
             <div className="flex items-center justify-center gap-2 text-muted text-[10px] font-mono uppercase tracking-[0.4em] font-black">
                <Volume2 size={12} className="text-solana-purple" />
@@ -107,27 +107,26 @@ export default function SuccessPage() {
             {/* Receipt Details */}
             <div className="space-y-2">
                <div className="flex justify-between items-center py-5 border-b border-border">
-                  <span className="text-[10px] text-muted font-mono uppercase tracking-widest font-black">Amount Paid</span>
+                  <span className="text-[10px] text-muted font-mono uppercase tracking-widest font-black">Amount Sent</span>
                   <span className="text-2xl font-black italic text-foreground underline decoration-solana-green decoration-2 underline-offset-4">
-                    {location.state?.amount || currentAnalysis?.transaction.amount || '0.00'} SOL
+                    {location.state?.amount || '0.00'} SOL
                   </span>
                </div>
                <div className="flex justify-between items-center py-5 border-b border-border">
                   <span className="text-[10px] text-muted font-mono uppercase tracking-widest font-black">Recipient</span>
                   <span className="text-sm font-black text-foreground italic">
-                    {currentAnalysis?.recipient.name || location.state?.recipient || 'External Wallet'}
+                    {location.state?.recipient || 'External Wallet'}
                   </span>
                </div>
-               <div className="flex justify-between items-center py-5">
-                  <span className="text-[10px] text-muted font-mono uppercase tracking-widest font-black">Risk Clearance</span>
-                  <span className={cn(
-                    "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded",
-                    (location.state?.riskLevel === 1 || currentAnalysis?.riskScore === 'low') ? "bg-solana-green/10 text-solana-green" :
-                    (location.state?.riskLevel === 2 || currentAnalysis?.riskScore === 'medium') ? "bg-orange-500/10 text-orange-500" :
-                    "bg-red-500/10 text-red-500"
-                  )}>
-                    {location.state?.riskLevel === 1 ? 'LOW RISK' : location.state?.riskLevel === 2 ? 'MEDIUM RISK' : 'HIGH RISK'}
-                  </span>
+               <div className="py-4">
+                  <a 
+                    href={location.state?.explorerUrl || `https://explorer.solana.com/tx/${txSignature}?cluster=devnet`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-solana-green/10 border border-solana-green/30 rounded-2xl text-solana-green font-black uppercase tracking-widest text-[10px] hover:bg-solana-green/20 transition-all shadow-xl shadow-solana-green/5"
+                  >
+                    View on Solana Explorer <ExternalLink size={14} />
+                  </a>
                </div>
             </div>
 
@@ -136,25 +135,15 @@ export default function SuccessPage() {
                <span className="text-[10px] font-mono text-muted uppercase tracking-widest font-black opacity-30 block">Signature (TXID)</span>
                <div className="flex items-center justify-between">
                   <span className="text-[11px] font-mono text-muted font-black truncate mr-4">{shortHash}</span>
-                  <div className="flex gap-2 shrink-0">
-                     <button 
-                       onClick={handleCopy}
-                       className={cn(
-                         "p-2.5 rounded-xl transition-all border",
-                         copied ? "bg-solana-green/20 text-solana-green border-solana-green/20" : "bg-foreground/5 text-muted border-border hover:text-foreground hover:bg-foreground/10"
-                       )}
-                     >
-                        <Copy size={16} />
-                     </button>
-                     <a 
-                       href={location.state?.explorerUrl || `https://explorer.solana.com/tx/${txSignature}?cluster=devnet`} 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       className="p-2.5 bg-foreground/5 border border-border rounded-xl transition-all text-muted hover:text-foreground hover:bg-foreground/10"
-                     >
-                        <ExternalLink size={16} />
-                     </a>
-                  </div>
+                  <button 
+                    onClick={handleCopy}
+                    className={cn(
+                      "p-2.5 rounded-xl transition-all border",
+                      copied ? "bg-solana-green/20 text-solana-green border-solana-green/20" : "bg-foreground/5 text-muted border-border hover:text-foreground hover:bg-foreground/10"
+                    )}
+                  >
+                    <Copy size={16} />
+                  </button>
                </div>
             </div>
           </div>
